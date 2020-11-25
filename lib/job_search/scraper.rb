@@ -1,6 +1,9 @@
 require 'colorize'
 class JobSearch::Scraper
-    SITE_TO_SCRAPE = "https://phoenix.craigslist.org/"
+
+    #only difference is the link changing in 
+    SITE_TO_SCRAPE = "https://phoenix.craigslist.org/" #"https://phoenix.craigslist.org/d/retail-wholesale/search/ret"
+    # SITE_TO_SCRAPE = "https://craigslist.org/" #"https://craigslist.org/d/talent-gigs/search/tlg" -line 22 'category_link)'
 
     def self.scrape_site
         uri = SITE_TO_SCRAPE
@@ -19,6 +22,7 @@ class JobSearch::Scraper
     end
 
     def self.scrape_category_for_job_links(category_link)
+        # binding.pry
         doc = Nokogiri::HTML(open(category_link))
 
         doc.search('.rows .result-info a').each do |row|
