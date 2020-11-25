@@ -1,0 +1,7 @@
+[] Create code to scrape the gigs section in addition to the job section
+[] create a helpers file to add functionality to that file and reduce DRY code
+[] update to more readable naming conventions
+[] new walk-thru video, (post updates)
+[] snapshots of working program (post updates)
+[] make it a published gem so I can use them for Mod 3 Project
+[] think about updating to include a db for exporting data to an excel as CSVs, to create an API, or junk data for projects
