@@ -3,11 +3,11 @@ require_relative 'version'
 class JobSearch::Location
     @@all = []
     
-    attr_accessor :state, :city
-    def initialize(state = nil, city = nil, link = nil)
+    attr_accessor :state, :city, :link
+    def initialize(state = nil, link = nil, city = nil)
         @state = state
-        @city = city
         @link = link
+        @city = city
 
         @@all << self 
     end
@@ -27,5 +27,4 @@ class JobSearch::Location
     def self.last
         @@all[@@all.count - 1]
     end
-    
 end
