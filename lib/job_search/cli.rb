@@ -16,17 +16,17 @@ class JobSearch::CLI
         view_another_job_or_category?
     end
 
-    # def get_city
-    #     puts "Please select a city by it's corresponding number:".colorize(:green)
-    #     sleep(5)
-    #     city = JobSearch::Scraper.location_scraper
-    #     input = gets.strip
-    # end
+    def get_state
+        puts "Please select a State by it's corresponding number:".colorize(:green)
+        sleep(5)
+        state = JobSearch::Scraper.state_selection
+        input = gets.strip
+    end
 
     def greeting
         puts "Welcome to the Craigslist Job Search!".colorize(:blue)
         sleep(3)
-        # get_city
+        get_state
         puts "Please choose from a category below:".colorize(:blue)
         sleep(2)
 
