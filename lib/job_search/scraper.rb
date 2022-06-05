@@ -1,19 +1,7 @@
 require 'colorize'
 class JobSearch::Scraper
 
-    #only difference is the link changing in 
-    SITE_TO_SCRAPE = "https://phoenix.craigslist.org/" #"https://phoenix.craigslist.org/d/retail-wholesale/search/ret"
-    # SITE_TO_SCRAPE = "https://craigslist.org/" #"https://craigslist.org/d/talent-gigs/search/tlg" -line 22 'category_link)'
-
-    def self.location_scraper
-        uri = "https://geo.craigslist.org/iso/us"
-        doc = Nokogiri::HTML(open(uri))
-
-        #get location
-        doc.search('.geo-site-list-container ul a').children.each.with_index(1) do |link, index|
-            puts "#{index}. #{link}"
-        end
-    end
+    SITE_TO_SCRAPE = "https://phoenix.craigslist.org/"
 
     def self.scrape_site
         uri = SITE_TO_SCRAPE
@@ -21,12 +9,10 @@ class JobSearch::Scraper
 
         #create categories for user to select from
         doc.search('.jobs .cats a').each.with_index(1) do |link, index|
-            category = link.attr('href').split("d/").last.split("/").first
-            
+            category = link.children.children.first.text
             link = link.attr('href')
             link[0] = "" #remove
             link = uri + link
-
             JobSearch::Category.new(category, link)
         end
     end
