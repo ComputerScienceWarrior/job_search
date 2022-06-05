@@ -1,9 +1,26 @@
 require 'colorize'
 class JobSearch::Scraper
 
-    SITE_TO_SCRAPE = "https://phoenix.craigslist.org/"
+    SITE_TO_SCRAPE = "https://craigslist.org/"
+
+    def self.state_selection
+        uri = SITE_TO_SCRAPE
+        doc = Nokogiri::HTML(open(uri))
+
+        #get location
+        doc.search('#rightbar .menu')[0].children[2].children[1].children.each.with_index(1) do |link, index|
+            JobSearch::Location.new(link.children.text, ('https:' + link.children[0].attributes['href'].value)) if index % 2 == 0
+            puts "#{index}. #{link.children.text}"
+        end
+        JobSearch::Location.all.pop #remove ancillary data
+    end
+
+    # def self.city_selection
+
+    # end
 
     def self.scrape_site
+        binding.pry
         uri = SITE_TO_SCRAPE
         doc = Nokogiri::HTML(open(uri))
 
