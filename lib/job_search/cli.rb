@@ -18,9 +18,20 @@ class JobSearch::CLI
 
     def get_state
         puts "Please select a State by it's corresponding number:".colorize(:green)
-        sleep(5)
+        sleep(3)
         state = JobSearch::Scraper.state_selection
         input = gets.strip
+        puts "You've selected the state " + "#{JobSearch::Location.all[input.to_i - 1].state.capitalize}!".colorize(:red)
+        sleep(2)
+        get_city_or_territory
+    end
+
+    def get_city_or_territory
+        JobSearch::Location.all.each.with_index(1) do |territory, index|
+            # Here, a call to ==>> JobSearch::Location.city_territory_scraper <<== should happen
+            # city = JobSearch::Location.city_territory_scraper
+            binding.pry
+        end
     end
 
     def greeting
