@@ -7,20 +7,18 @@ class JobSearch::Scraper
         uri = SITE_TO_SCRAPE
         doc = Nokogiri::HTML(open(uri))
 
-        #get location
+        counter = 0
         doc.search('#rightbar .menu')[0].children[2].children[1].children.each.with_index(1) do |link, index|
-            JobSearch::Location.new(link.children.text, ('https:' + link.children[0].attributes['href'].value)) if index % 2 == 0
-            puts "#{index}. #{link.children.text}"
+            next if index % 2 != 0 || link.children.text == ''
+            JobSearch::Location.new(link.children.text, ('https:' + link.children[0].attributes['href'].value))
+            counter += 1
+            puts "#{counter}. #{link.children.text}"
         end
-        JobSearch::Location.all.pop #remove ancillary data
     end
 
-    # def self.city_selection
-
-    # end
+    
 
     def self.scrape_site
-        binding.pry
         uri = SITE_TO_SCRAPE
         doc = Nokogiri::HTML(open(uri))
 
