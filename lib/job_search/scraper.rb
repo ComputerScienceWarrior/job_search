@@ -16,7 +16,33 @@ class JobSearch::Scraper
         end
     end
 
-    
+    def self.city_territory_scraper(city)
+        uri = city.link
+        doc = Nokogiri::HTML(open(uri))
+
+        no_territories = doc.search('.geo-site-list').count == 0
+        no_territories ? (
+            return doc.children[1].children[1].children[17].attributes["content"].value
+        ) : (
+            counter = 0
+            opts = []
+            doc.search('.geo-site-list').children.each.with_index(1) do |city, i|
+                if city.children.count > 0
+                    city_name = city.children[0].text
+                    city_link = city.children[0].attributes["href"].value
+                    opts << "#{counter + 1}. #{city_name.split(/ |\_/).map(&:capitalize).join(" ")} ===> #{city_link}"
+                    counter += 1
+                else
+                    next
+                end
+            end
+            opts
+        )
+    end
+
+    def no_city_territories?(doc)
+        doc.search('.geo-site-list').count == 0
+    end
 
     def self.scrape_site
         uri = SITE_TO_SCRAPE
