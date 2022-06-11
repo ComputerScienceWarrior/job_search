@@ -44,22 +44,22 @@ class JobSearch::Scraper
         doc.search('.geo-site-list').count == 0
     end
 
-    def self.scrape_site
-        uri = SITE_TO_SCRAPE
+    def self.scrape_site(site_selection)
+        uri = site_selection
         doc = Nokogiri::HTML(open(uri))
 
         #create categories for user to select from
         doc.search('.jobs .cats a').each.with_index(1) do |link, index|
+
             category = link.children.children.first.text
             link = link.attr('href')
-            link[0] = "" #remove
             link = uri + link
             JobSearch::Category.new(category, link)
         end
     end
 
     def self.scrape_category_for_job_links(category_link)
-        doc = Nokogiri::HTML(open(category_link))
+        doc = Nokogiri::HTML(open(category_link)) #current problem code...just hangs
 
         doc.search('.rows .result-info a').each do |row|
             job_link = row.attr('href')
