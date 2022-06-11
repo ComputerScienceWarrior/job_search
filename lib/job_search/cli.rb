@@ -7,13 +7,28 @@ require_relative 'version'
 class JobSearch::CLI 
 
     def program_run
-        greeting
-        create_and_display_categories
+        site_to_scrape = greeting
+        create_and_display_categories site_to_scrape
         user_category_selection 
         create_and_display_all_job_listings
         user_job_selection 
         explore_the_job 
         view_another_job_or_category?
+    end
+
+    def greeting
+        puts "Welcome to the Craigslist Job Search!".colorize(:blue)
+        sleep(3)
+        val = get_state
+        puts "Please choose from a category below:".colorize(:blue)
+        sleep(2)
+        puts "Which category would you like more information on?".colorize(:yellow)
+        puts "Choose the corresponding number from the list to get more information.".colorize(:yellow)
+        puts "For example, enter '1' for 'accounting-finance' job information.".colorize(:yellow)
+        sleep 4
+
+        val = val.split(" ").last unless val.nil?
+        return val
     end
 
     def get_state
@@ -23,32 +38,25 @@ class JobSearch::CLI
         input = gets.strip
         puts "You've selected the state " + "#{JobSearch::Location.all[input.to_i - 1].state.capitalize}!".colorize(:red)
         sleep(2)
-        get_city_or_territory
+        return get_city_or_territory(JobSearch::Location.all[input.to_i - 1])
     end
 
-    def get_city_or_territory
-        JobSearch::Location.all.each.with_index(1) do |territory, index|
-            # Here, a call to ==>> JobSearch::Location.city_territory_scraper <<== should happen
-            # city = JobSearch::Location.city_territory_scraper
-            binding.pry
-        end
-    end
-
-    def greeting
-        puts "Welcome to the Craigslist Job Search!".colorize(:blue)
-        sleep(3)
-        get_state
-        puts "Please choose from a category below:".colorize(:blue)
+    def get_city_or_territory(state_territory)
+        city = JobSearch::Scraper.city_territory_scraper state_territory
+        puts "Which location in #{state_territory.state} would you like to browse for jobs?".colorize(:green)
         sleep(2)
 
-        puts "Which category would you like more information on?".colorize(:yellow)
-        puts "Choose the corresponding number from the list to get more information.".colorize(:yellow)
-        puts "For example, enter '1' for 'accounting-finance' job information.".colorize(:yellow)
-        sleep(4)
+         if city.kind_of?(Array)
+            city.each {|city| puts "#{city}" }
+            input = gets.chomp
+            selection = city[input.to_i - 1]
+         end
+
+         return selection
     end
 
-    def create_and_display_categories
-        categories = JobSearch::Scraper.scrape_site #store site data in categories variable
+    def create_and_display_categories(site_to_scrape)
+        categories = JobSearch::Scraper.scrape_site(site_to_scrape) #store site data in categories variable
         JobSearch::Category.all.each.with_index(1) {|category, index| puts "#{index}. #{category.category_name}"}
     end   
 
@@ -58,7 +66,7 @@ class JobSearch::CLI
         if  (1..JobSearch::Category.all.size).include?(input.to_i)
             puts "You've selected the category " + "#{JobSearch::Category.all[input.to_i - 1].category_name}!".colorize(:red)
             
-            sleep(2)
+            sleep 2
             JobSearch::Scraper.scrape_category_for_job_links(JobSearch::Category.all[input.to_i - 1].link) #scrape this
         else
             puts "Sorry, that's not valid input, please try again.".upcase.colorize(:red)
@@ -71,7 +79,9 @@ class JobSearch::CLI
 
     def create_and_display_all_job_listings
         puts "Which job would you like more information on?".colorize(:green)
+        sleep 4
         puts "Available jobs in this category:".colorize(:blue)
+        sleep 4
         puts "--------------------------------"
 
         JobSearch::Category.jobs.each.with_index(1) { |j, index| puts "#{index}. #{j.split("/d/").last.split('/').first}" }
@@ -80,10 +90,10 @@ class JobSearch::CLI
     def user_job_selection
         input = gets.strip.downcase
 
-        if (1..JobSearch::Category.jobs.size).include?(input.to_i) 
+        if (1..JobSearch::Category.jobs.size).include? input.to_i 
             puts "Here is the job link if you'd like to view the job page: " + "#{JobSearch::Category.jobs[input.to_i - 1]}".colorize(:light_blue)
-            sleep(2)
-            JobSearch::Scraper.scrape_job_link(JobSearch::Category.jobs[input.to_i - 1])
+            sleep 2
+            JobSearch::Scraper.scrape_job_link JobSearch::Category.jobs[input.to_i - 1]
             JobSearch::Job.all[0].category = JobSearch::Category.all[0]
         else
             puts "Sorry, that's not valid input. Please try again.".upcase.colorize(:red)
